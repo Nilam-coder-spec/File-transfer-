@@ -116,40 +116,99 @@ connectBtn.addEventListener("click", async () => {
   }
 });
 
-function showProgress(name, percent, detail) {
-  $("transferBox").classList.remove("hidden");
-  $("transferName").textContent = name;
-  $("transferPercent").textContent = percent + "%";
-  $("progressBar").style.width = percent + "%";
-  $("transferDetail").textContent = detail;
+
+function showSendProgress(name, percent, detail) {
+  $("sendTransferBox").classList.remove("hidden");
+  $("sendTransferName").textContent = name;
+  $("sendTransferPercent").textContent = percent + "%";
+  $("sendProgressBar").style.width = percent + "%";
+  $("sendTransferDetail").textContent = detail;
 }
+
+function showReceiveProgress(name, percent, detail) {
+  $("receiveNote").classList.add("hidden");
+  $("receiveTransferBox").classList.remove("hidden");
+  $("receiveTransferName").textContent = name;
+  $("receiveTransferPercent").textContent = percent + "%";
+  $("receiveProgressBar").style.width = percent + "%";
+  $("receiveTransferDetail").textContent = detail;
+}
+
+function showProgress(name, percent, detail) {
+  if (connection && sending) {
+    showSendProgress(name, percent, detail);
+  } else {
+    showReceiveProgress(name, percent, detail);
+  }
+}
+
 function handleData(data) {
   if (!data || typeof data !== "object") return;
+
   if (data.type === "file-start") {
-    incoming = { name:data.name, mime:data.mime || "application/octet-stream", size:data.size, chunks:[], received:0 };
-    showProgress("Receiving " + data.name, 0, "Receiving from connected device…");
-    connection.send({ type:"file-ready" });
+    incoming = {
+      name: data.name,
+      mime: data.mime || "application/octet-stream",
+      size: data.size,
+      chunks: [],
+      received: 0
+    };
+
+    showReceiveProgress(
+      "Receiving " + data.name,
+      0,
+      "Receiving from connected device…"
+    );
+
+    connection.send({ type: "file-ready" });
+
   } else if (data.type === "file-chunk" && incoming) {
     incoming.chunks.push(data.chunk);
     incoming.received += data.chunk.byteLength;
-    const percent = incoming.size ? Math.min(100, Math.round(incoming.received / incoming.size * 100)) : 100;
-    showProgress("Receiving " + incoming.name, percent, `${(incoming.received/1048576).toFixed(1)} MB received`);
-    connection.send({ type:"chunk-ack" });
+
+    const percent = incoming.size
+      ? Math.min(100, Math.round(incoming.received / incoming.size * 100))
+      : 100;
+
+    showReceiveProgress(
+      "Receiving " + incoming.name,
+      percent,
+      `${(incoming.received / 1048576).toFixed(1)} MB received`
+    );
+
+    connection.send({ type: "chunk-ack" });
+
   } else if (data.type === "file-end" && incoming) {
-    const blob = new Blob(incoming.chunks, { type:incoming.mime });
+    const blob = new Blob(incoming.chunks, { type: incoming.mime });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = incoming.name;
-    document.body.appendChild(a); a.click(); a.remove();
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = incoming.name;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
     setTimeout(() => URL.revokeObjectURL(url), 60000);
-    showProgress("Received " + incoming.name, 100, "Download started.");
+
+    showReceiveProgress(
+      "Received " + incoming.name,
+      100,
+      "Download started."
+    );
+
     toast("File received — download started");
     incoming = null;
+
   } else if (data.type === "file-ready") {
     sendNextChunk();
+
   } else if (data.type === "chunk-ack") {
     sendNextChunk();
   }
 }
+
 function sendNextChunk() {
   if (!sending || !connection || !connection.open) return;
   const task = sendQueue[0];
@@ -157,7 +216,7 @@ function sendNextChunk() {
   if (task.offset >= task.file.size) {
     connection.send({ type:"file-end" });
     sendQueue.shift(); sending = false;
-    showProgress("Sent " + task.file.name, 100, "Transfer complete.");
+    showSendProgress("Sent " + task.file.name, 100, "Transfer complete.");
     toast("File sent successfully");
     if (sendQueue.length) startNextFile();
     return;
@@ -167,7 +226,7 @@ function sendNextChunk() {
     connection.send({ type:"file-chunk", chunk:buffer });
     task.offset += buffer.byteLength;
     const percent = task.file.size ? Math.round(task.offset / task.file.size * 100) : 100;
-    showProgress("Sending " + task.file.name, percent, `${(task.offset/1048576).toFixed(1)} MB sent`);
+    showSendProgress("Sending " + task.file.name, percent, `${(task.offset/1048576).toFixed(1)} MB sent`);
   }).catch(err => { sending = false; toast("Could not read file: " + err.message); });
 }
 function startNextFile() {
