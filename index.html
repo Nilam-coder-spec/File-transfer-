@@ -89,15 +89,39 @@
 </div>
 
         </div>
-        <div id="transferBox" class="transfer-box hidden">
-          <div class="transfer-top"><strong id="transferName">Preparing…</strong><span id="transferPercent">0%</span></div>
-          <div class="progress"><div id="progressBar"></div></div>
-          <p id="transferDetail" class="hint">Waiting…</p>
-        </div>
-        <div class="receive-note">
-          <span class="receive-icon">↓</span>
-          <div><strong>Receiving files?</strong><p>When the other device sends something, a download will appear here.</p></div>
-        </div>
+       
+<!-- SENDING PROGRESS -->
+<div id="sendTransferBox" class="transfer-box hidden">
+  <div class="transfer-top">
+    <strong id="sendTransferName">Preparing…</strong>
+    <span id="sendTransferPercent">0%</span>
+  </div>
+  <div class="progress">
+    <div id="sendProgressBar"></div>
+  </div>
+  <p id="sendTransferDetail" class="hint">Waiting…</p>
+</div>
+
+<!-- RECEIVING SECTION -->
+<div class="receive-note" id="receiveNote">
+  <span class="receive-icon">↓</span>
+  <div>
+    <strong>Receiving files?</strong>
+    <p>When the other device sends something, it will appear here.</p>
+  </div>
+</div>
+
+<div id="receiveTransferBox" class="transfer-box hidden">
+  <div class="transfer-top">
+    <strong id="receiveTransferName">Receiving…</strong>
+    <span id="receiveTransferPercent">0%</span>
+  </div>
+  <div class="progress">
+    <div id="receiveProgressBar"></div>
+  </div>
+  <p id="receiveTransferDetail" class="hint">Waiting…</p>
+</div>
+
       </article>
     </section>
     <footer>
