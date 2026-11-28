@@ -56,3 +56,20 @@ footer{padding:28px 0 36px;text-align:center;color:#8fa0b7;font-size:11px;line-h
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.hero{padding-top:42px}.panel{padding:19px}.topbar{height:64px}.secure{font-size:10px}}
 @media(max-width:390px){.shell{width:calc(100% - 20px)}.panel-heading{align-items:flex-start;flex-direction:column}.join-line{flex-direction:column}.code-line strong{font-size:29px;letter-spacing:5px}}
+.site-footer {
+  text-align: center;
+  padding: 25px 10px;
+  margin-top: 40px;
+  color: #888;
+  font-size: 14px;
+}
+
+.site-footer strong {
+  color: #6366f1;
+}
+
+.site-footer small {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+}
