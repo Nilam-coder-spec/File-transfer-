@@ -214,3 +214,34 @@ $("dropZone").addEventListener("drop", e => {
   if (e.dataTransfer.files.length) prepareAndSend(Array.from(e.dataTransfer.files), false);
 });
 setConnected(false);
+
+
+// ABOUT POPUP
+
+const aboutBtn = document.getElementById("aboutBtn");
+const aboutOverlay = document.getElementById("aboutOverlay");
+const aboutClose = document.getElementById("aboutClose");
+
+function openAbout() {
+  aboutOverlay.classList.add("active");
+}
+
+function closeAbout() {
+  aboutOverlay.classList.remove("active");
+}
+
+aboutBtn.addEventListener("click", openAbout);
+
+aboutClose.addEventListener("click", closeAbout);
+
+aboutOverlay.addEventListener("click", function(event) {
+  if (event.target === aboutOverlay) {
+    closeAbout();
+  }
+});
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") {
+    closeAbout();
+  }
+});

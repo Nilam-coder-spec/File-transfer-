@@ -12,6 +12,11 @@
     <header class="topbar">
       <a class="brand" href="#"><span class="brand-icon">↗</span> FileConnector</a>
       <span class="secure"><span class="dot"></span> Peer-to-peer transfer</span>
+      <!-- ABOUT BUTTON -->
+<button class="about-fab" id="aboutBtn" aria-label="About FileConnect">
+  <span class="about-icon">ⓘ</span>
+  <span class="about-label">ABOUT</span>
+</button>
     </header>
 
     <section class="hero">
@@ -19,7 +24,7 @@
       <h1>Move files.<br><span>Not through the cloud.</span></h1>
       <p>Connect two devices with a one-time code and send files directly between them.</p>
     </section>
-
+  
     <section class="grid">
       <article class="panel connection-panel">
         <div class="panel-heading">
@@ -81,6 +86,62 @@
   <p>Made with ❤️ by <strong>Ankur Raj</strong></p>
   <small>© 2026 FileConnect. All rights reserved.</small>
 </footer>
+<!-- ABOUT POPUP -->
+<div class="about-overlay" id="aboutOverlay">
+  <div class="about-dialog" id="aboutDialog">
+
+    <button class="about-close" id="aboutClose" aria-label="Close">×</button>
+
+    <div class="about-heading">
+      <span class="about-symbol">ⓘ</span>
+      <h2>About FileConnect</h2>
+    </div>
+
+    <div class="about-line"></div>
+
+    <p class="about-description">
+      FileConnect is a simple and user-friendly platform designed
+      to make file sharing between devices fast and convenient.
+      It allows users to connect smartphones, tablets, laptops
+      and computers using a unique 6-digit code. With an
+      easy-to-use interface and a straightforward connection
+      process, users can transfer files without complicated
+      setup. Our goal is to make sharing files across devices
+      easier and more accessible for everyone.
+    </p>
+
+    <div class="about-info">
+
+      <div class="info-item">
+        <span>AUTHOR</span>
+        <strong>Ankur Raj</strong>
+      </div>
+
+      <div class="info-item">
+        <span>CONTACT</span>
+        <strong>+91 XXX XXXXX</strong>
+      </div>
+
+      <div class="info-item">
+        <span>EMAIL</span>
+        <strong>ankur.raj1910@hotmail.com</strong>
+      </div>
+      
+      <div class="info-item">
+  <span>ADDRESS</span>
+  <strong>Adarsh Gram, Road No. 3, Bairiya, Muzaffarpur</strong>
+</div>
+
+    </div>
+
+    <div class="about-footer">
+      FileConnect · Simple File Sharing
+    </div>
+
+  </div>
+</div>
+
+HTML
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
