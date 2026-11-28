@@ -207,6 +207,11 @@ function handleData(data) {
   } else if (data.type === "chunk-ack") {
     sendNextChunk();
   }
+  else if (data.type === "chat-message") {
+  if (typeof data.text === "string") {
+    addChatMessage(data.text, "received", data.time);
+  }
+}
 }
 
 function sendNextChunk() {
@@ -304,3 +309,110 @@ document.addEventListener("keydown", function(event) {
     closeAbout();
   }
 });
+
+
+// =================================
+// FILECONNECT CHAT SYSTEM
+// =================================
+
+const chatInput = document.getElementById("chatInput");
+const chatSendBtn = document.getElementById("chatSendBtn");
+const chatMessages = document.getElementById("chatMessages");
+const chatStatus = document.getElementById("chatStatus");
+const chatDot = document.getElementById("chatDot");
+const chatWelcome = document.getElementById("chatWelcome");
+
+function updateChatConnection() {
+  const connected =
+    typeof connection !== "undefined" &&
+    connection &&
+    connection.open;
+
+  chatSendBtn.disabled = !connected;
+  chatInput.disabled = !connected;
+
+  chatStatus.textContent = connected
+    ? "Connected"
+    : "Waiting for connection...";
+
+  chatDot.classList.toggle("online", !!connected);
+}
+
+function addChatMessage(message, type, time) {
+  chatWelcome?.classList.add("hidden");
+
+  const bubble = document.createElement("div");
+  bubble.className = "chat-message " + type;
+
+  const text = document.createElement("p");
+  text.textContent = message;
+
+  const timestamp = document.createElement("small");
+  timestamp.textContent = new Date(time || Date.now())
+    .toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  bubble.appendChild(text);
+  bubble.appendChild(timestamp);
+
+  chatMessages.appendChild(bubble);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function sendChatMessage() {
+  const message = chatInput.value.trim();
+
+  if (!message) return;
+
+  if (
+    typeof connection === "undefined" ||
+    !connection ||
+    !connection.open
+  ) {
+    alert("Connect to another device first.");
+    updateChatConnection();
+    return;
+  }
+
+  try {
+    connection.send({
+      type: "chat-message",
+      text: message,
+      time: Date.now()
+    });
+
+    addChatMessage(message, "sent", Date.now());
+
+    chatInput.value = "";
+    chatInput.focus();
+
+  } catch (error) {
+    alert("Message could not be sent.");
+    console.error(error);
+  }
+}
+
+chatSendBtn.addEventListener("click", sendChatMessage);
+
+chatInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendChatMessage();
+  }
+});
+
+// Add this inside your EXISTING handleData() function:
+// if (data.type === "chat-message") {
+//   addChatMessage(data.text, "received", data.time);
+// }
+
+updateChatConnection();
+
+// Refresh connection status when peer connection changes.
+if (typeof connection !== "undefined" && connection) {
+  connection.on("open", updateChatConnection);
+  connection.on("close", updateChatConnection);
+  connection.on("error", updateChatConnection);
+}

@@ -126,6 +126,48 @@
 
       </article>
     </section>
+    
+    
+<!-- CHAT SECTION -->
+<section class="chat-panel" id="chatPanel">
+
+  <div class="chat-header">
+    <div class="chat-user">
+      <div class="chat-avatar">💬</div>
+      <div>
+        <h3>FileConnect Chat</h3>
+        <span id="chatStatus">Waiting for connection...</span>
+      </div>
+    </div>
+    <span class="chat-online-dot" id="chatDot"></span>
+  </div>
+
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-welcome" id="chatWelcome">
+      <div>👋</div>
+      <h3>Start a conversation</h3>
+      <p>Connect your device to start chatting.</p>
+    </div>
+  </div>
+
+  <div class="chat-input-area">
+    <input
+      type="text"
+      id="chatInput"
+      placeholder="Type a message..."
+      maxlength="2000"
+      autocomplete="off"
+    />
+
+    <button id="chatSendBtn" type="button" disabled>
+      ➤
+    </button>
+  </div>
+
+  <p class="chat-footer">Messages are sent through your device connection.</p>
+
+</section>
+
     <footer>
       <p>FileConnect is a browser-based file transfer app. Keep both devices and this page open during transfers.</p>
       <p class="foot-small">Use only with devices and files you are authorized to share.</p>
