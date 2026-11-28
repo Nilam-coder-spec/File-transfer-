@@ -57,15 +57,37 @@
           <div><span class="step">02</span><h2>Send files</h2></div>
           <span class="file-limit">Files & folders</span>
         </div>
-        <div id="dropZone" class="drop-zone">
-          <div class="upload-icon">↑</div>
-          <h3>Choose what to send</h3>
-          <p>Select files or a folder from this device.</p>
-          <div class="pickers">
-            <label class="button secondary picker">Choose files<input id="fileInput" type="file" multiple /></label>
-            <label class="button secondary picker">Choose folder<input id="folderInput" type="file" webkitdirectory multiple /></label>
-          </div>
-          <span class="hint">Folder contents are bundled into a ZIP before sending.</span>
+        
+<div id="dropZone" class="drop-zone">
+  <div class="upload-icon">↑</div>
+
+  <h3>Drop files here to send</h3>
+  <p class="drop-description">
+    Drag and drop your files here, or browse from your device.
+  </p>
+
+  <div class="drop-divider">
+    <span>OR</span>
+  </div>
+
+  <div class="pickers">
+    <label class="button secondary picker">
+      Choose files
+      <input id="fileInput" type="file" multiple />
+    </label>
+
+    <label class="button secondary picker">
+      Choose folder
+      <input id="folderInput" type="file" webkitdirectory multiple />
+    </label>
+  </div>
+
+  <div class="drop-hint">
+    <span>↗</span>
+    <span>Files and folders supported</span>
+  </div>
+</div>
+
         </div>
         <div id="transferBox" class="transfer-box hidden">
           <div class="transfer-top"><strong id="transferName">Preparing…</strong><span id="transferPercent">0%</span></div>

@@ -336,3 +336,85 @@ footer{padding:28px 0 36px;text-align:center;color:#8fa0b7;font-size:11px;line-h
     font-size: 21px;
   }
 }
+
+
+/* DRAG & DROP - MATCHING ORIGINAL THEME */
+
+.drop-zone {
+  position: relative;
+  border: 1px dashed var(--border, rgba(255,255,255,0.16));
+  border-radius: 14px;
+  padding: 30px 18px;
+  text-align: center;
+  background: rgba(255,255,255,0.025);
+  transition: all 0.3s ease;
+}
+
+.drop-zone.drag-active {
+  border-color: #77e0bd !important;
+  background: rgba(119,224,189,0.07);
+  transform: scale(1.01);
+}
+
+.drop-zone .upload-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(119,224,189,0.10);
+  color: #77e0bd;
+  font-size: 32px;
+  transition: transform 0.3s ease;
+}
+
+.drop-zone.drag-active .upload-icon {
+  transform: translateY(-4px);
+}
+
+.drop-description {
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: bold;
+  color: #fff;
+}
+
+.drop-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  opacity: 0.45;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.drop-divider::before,
+.drop-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+}
+
+.drop-hint {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.drop-hint span:first-child {
+  color: #77e0bd;
+  font-size: 17px;
+}
+
+.drop-zone .pickers {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
