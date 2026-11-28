@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const createBtn = $("createBtn"), connectBtn = $("connectBtn");
-let peer = null, connection = null, myPeerId = null;
+const API_BASE = (window.FILECONNECT_API_BASE || "").replace(/\/$/, "");
+let peer = null, connection = null, myPeerId = null, sessionCode = null;
 let incoming = null, sendQueue = [], sending = false;
 
 function toast(message) {
@@ -13,41 +14,62 @@ function setConnected(connected) {
   $("status").classList.toggle("connected", connected);
   $("dropZone").style.opacity = connected ? "1" : ".55";
 }
-//function randomCode() {
-  // A short display code is easier to type; PeerJS uses the full generated ID internally.
-//  return Math.random().toString(36).slice(2, 8).toUpperCase();
-//}
-
-function randomCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+async function apiPost(path, body) {
+  if (!API_BASE) throw new Error("Pairing server URL is not configured.");
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch {
+    throw new Error("Could not reach the pairing server. Check its URL and try again.");
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Pairing server error (${response.status}).`);
+  return data;
 }
-
-
-
 function makePeer() {
   return new Promise((resolve, reject) => {
-    const p = new Peer(randomCode());
-    p.on("open", id => resolve({ peer:p, id }));
-    p.on("error", err => reject(err));
+    const p = new Peer();
+    let settled = false;
+    p.on("open", id => {
+      if (settled) return;
+      settled = true;
+      resolve({ peer: p, id });
+    });
+    p.on("error", err => {
+      if (!settled) {
+        settled = true;
+        reject(err);
+      } else {
+        setMessage("Connection service error: " + err.message);
+      }
+    });
     p.on("connection", conn => attachConnection(conn));
   });
 }
 async function ensurePeer() {
-  if (peer && !peer.destroyed) return;
-  setMessage("Starting secure connection service…");
+  if (peer && !peer.destroyed && myPeerId) return;
+  setMessage("Starting device connection…");
   const result = await makePeer();
-  peer = result.peer; myPeerId = result.id;
+  peer = result.peer;
+  myPeerId = result.id;
 }
 function attachConnection(conn) {
   if (connection && connection.open) { conn.close(); return; }
   connection = conn;
   conn.on("open", () => {
-    setConnected(true); setMessage("Connected. You can now send files in either direction.");
+    setConnected(true);
+    setMessage("Connected. You can now send files in either direction.");
     toast("Devices connected!");
   });
   conn.on("data", handleData);
   conn.on("close", () => {
-    connection = null; setConnected(false); setMessage("Connection closed. Generate or enter a code to reconnect.");
+    connection = null;
+    setConnected(false);
+    setMessage("Connection closed. Generate or enter a code to reconnect.");
   });
   conn.on("error", err => setMessage("Connection error: " + err.message));
 }
@@ -55,29 +77,43 @@ createBtn.addEventListener("click", async () => {
   createBtn.disabled = true;
   try {
     await ensurePeer();
-    $("myCode").textContent = myPeerId;
+    const result = await apiPost("/api/sessions", { peerId: myPeerId });
+    sessionCode = result.code;
+    $("myCode").textContent = sessionCode;
     $("myCodeWrap").classList.remove("hidden");
-    setMessage("Your code is ready. Enter this full code on your second device.");
-    toast("Connection code generated");
+    setMessage(`Your code is ready. It expires in ${Math.floor(result.expiresInSeconds / 60)} minutes. Enter it on your second device.`);
+    toast("6-digit connection code generated");
   } catch (err) {
-    setMessage("Could not start connection: " + err.message);
-  } finally { createBtn.disabled = false; }
+    setMessage("Could not create a code: " + err.message);
+  } finally {
+    createBtn.disabled = false;
+  }
 });
 $("copyBtn").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(myPeerId); toast("Code copied"); }
-  catch { toast("Select and copy the code manually"); }
+  if (!sessionCode) return toast("Generate a code first");
+  try {
+    await navigator.clipboard.writeText(sessionCode);
+    toast("Code copied");
+  } catch {
+    toast("Select and copy the code manually");
+  }
 });
 connectBtn.addEventListener("click", async () => {
-  const remoteId = $("remoteCode").value.trim();
-  if (!remoteId) return toast("Enter the other device's code first");
+  const code = $("remoteCode").value.trim();
+  if (!/^\d{6}$/.test(code)) return toast("Enter a valid 6-digit code");
   connectBtn.disabled = true;
   try {
     await ensurePeer();
-    setMessage("Connecting… keep both pages open.");
-    const conn = peer.connect(remoteId, { reliable:true });
+    setMessage("Checking code…");
+    const result = await apiPost("/api/sessions/lookup", { code });
+    setMessage("Code found. Connecting… keep both pages open.");
+    const conn = peer.connect(result.peerId, { reliable: true });
     attachConnection(conn);
-  } catch (err) { setMessage("Could not connect: " + err.message); }
-  finally { connectBtn.disabled = false; }
+  } catch (err) {
+    setMessage("Could not connect: " + err.message);
+  } finally {
+    connectBtn.disabled = false;
+  }
 });
 
 function showProgress(name, percent, detail) {
@@ -156,9 +192,9 @@ async function prepareAndSend(fileList, isFolder) {
     const blob = await zip.generateAsync({ type:"blob" }, metadata => {
       showProgress("Creating folder ZIP…", Math.round(metadata.percent), "Bundling folder contents");
     });
-    file = new File([blob], (fileList[0].webkitRelativePath.split("/")[0] || "folder") + ".zip", { type:"application/zip" });
+    const firstPath = fileList[0].webkitRelativePath || fileList[0].name;
+    file = new File([blob], (firstPath.split("/")[0] || "folder") + ".zip", { type:"application/zip" });
   } else {
-    // Queue each selected file separately.
     for (const f of fileList) sendQueue.push({ file:f, offset:0 });
     startNextFile();
     return;

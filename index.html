@@ -26,7 +26,6 @@
           <div><span class="step">01</span><h2>Connect devices</h2></div>
           <span id="status" class="status">Not connected</span>
         </div>
-
         <div class="choice">
           <h3>Start a connection</h3>
           <p>Create a code on this device, then enter it on your other device.</p>
@@ -34,16 +33,14 @@
           <div id="myCodeWrap" class="code-wrap hidden">
             <span class="small-label">YOUR CONNECTION CODE</span>
             <div class="code-line"><strong id="myCode">—</strong><button id="copyBtn" class="icon-button" aria-label="Copy code">Copy</button></div>
-            <p class="hint">Keep this code private. It works while this page stays open.</p>
+            <p class="hint">This code expires after five minutes. Keep it private.</p>
           </div>
         </div>
-
         <div class="or"><span>OR JOIN ANOTHER DEVICE</span></div>
-
         <div class="join">
-          <label for="remoteCode">Enter the other device's code</label>
+          <label for="remoteCode">Enter the other device's 6-digit code</label>
           <div class="join-line">
-            <input id="remoteCode" type="text" placeholder="Paste connection code" autocomplete="off" />
+            <input id="remoteCode" type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="000000" autocomplete="one-time-code" />
             <button id="connectBtn" class="button secondary">Connect</button>
           </div>
         </div>
@@ -55,7 +52,6 @@
           <div><span class="step">02</span><h2>Send files</h2></div>
           <span class="file-limit">Files & folders</span>
         </div>
-
         <div id="dropZone" class="drop-zone">
           <div class="upload-icon">↑</div>
           <h3>Choose what to send</h3>
@@ -66,29 +62,26 @@
           </div>
           <span class="hint">Folder contents are bundled into a ZIP before sending.</span>
         </div>
-
         <div id="transferBox" class="transfer-box hidden">
           <div class="transfer-top"><strong id="transferName">Preparing…</strong><span id="transferPercent">0%</span></div>
           <div class="progress"><div id="progressBar"></div></div>
           <p id="transferDetail" class="hint">Waiting…</p>
         </div>
-
         <div class="receive-note">
           <span class="receive-icon">↓</span>
           <div><strong>Receiving files?</strong><p>When the other device sends something, a download will appear here.</p></div>
         </div>
       </article>
     </section>
-
     <footer>
-      <p>FileConnect is a browser-based demo. Keep both devices and this page open during transfers.</p>
+      <p>FileConnect is a browser-based file transfer app. Keep both devices and this page open during transfers.</p>
       <p class="foot-small">Use only with devices and files you are authorized to share.</p>
     </footer>
   </main>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
